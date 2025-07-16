@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Layout, Input, Button, List, Typography, Card, Row, Col, message } from 'antd';
-import APlayer from 'aplayer';
+// import APlayer from 'aplayer';
+import { APlayer } from 'aplayer-react';
 import 'aplayer/dist/APlayer.min.css';
 import './App.css'; // 添加自定义样式
 
@@ -15,6 +16,7 @@ function App() {
   const [currentSong, setCurrentSong] = useState(null);
   const playerRef = useRef(null);
   const aplayerInstance = useRef(null);
+  const [musicUrl, setMusicUrl] = useState('')
 
   // 更新时间
   useEffect(() => {
@@ -26,23 +28,23 @@ function App() {
   }, []);
 
   // 初始化播放器
-  useEffect(() => {
-    if (!aplayerInstance.current) {
-      aplayerInstance.current = new APlayer({
-        container: playerRef.current,
-        fixed: true,
-        autoplay: false, // 不自动播放
-        audio: []
-      });
-    }
+  // useEffect(() => {
+  //   if (!aplayerInstance.current) {
+  //     aplayerInstance.current = new APlayer({
+  //       container: playerRef.current,
+  //       fixed: true,
+  //       autoplay: false, // 不自动播放
+  //       audio: []
+  //     });
+  //   }
     
-    return () => {
-      if (aplayerInstance.current) {
-        aplayerInstance.current.destroy();
-        aplayerInstance.current = null;
-      }
-    };
-  }, []);
+  //   return () => {
+  //     if (aplayerInstance.current) {
+  //       aplayerInstance.current.destroy();
+  //       aplayerInstance.current = null;
+  //     }
+  //   };
+  // }, []);
 
   // 搜索歌曲
   const handleSearch = async () => {
@@ -102,23 +104,29 @@ function App() {
       });
 
       // 立即添加并播放
-      const url = encodeURI(`http://127.0.0.1:8000${result.download_api}`);
-      console.log('APlayer播放URL:', url);
+          // const path = encodeURIComponent(result.download_api);
+          const path = result.download_api;
+    const url = `http://127.0.0.1:8000${path}`;
+    
+    setMusicUrl(url);
+    console.log('音乐URL:', url);
 
-      if (aplayerInstance.current) {
-        aplayerInstance.current.list.clear();
-        aplayerInstance.current.list.add({
-          name: song.title,
-          artist: song.artist,
-          url,
-          cover: 'https://via.placeholder.com/100?text=Music',
-          type: 'audio/mp3'
-        });
-        // 直接play，不用监听canplay
-        setTimeout(() => {
-          aplayerInstance.current.play();
-        }, 0);
-      }
+    // if (aplayerInstance.current) {
+    //   aplayerInstance.current.list.clear();
+      
+    //   // 添加音频（不指定type）
+    //   aplayerInstance.current.list.add({
+    //     name: song.title,
+    //     artist: song.artist,
+    //     url,
+    //     cover: 'https://via.placeholder.com/100?text=Music'
+    //   });
+
+    //   // 确保加载完成后再播放
+    //   aplayerInstance.current.on('loadeddata', () => {
+    //     aplayerInstance.current.play();
+    //   });
+    // }
 
       message.success(`已加载: ${song.title} - ${song.artist}`);
     } catch (error) {
@@ -155,7 +163,7 @@ function App() {
       </Header>
       
       <Content style={{ padding: '24px' }}>
-        <audio src={"http://127.0.0.1:8000/download_file?filename=今天 - 刘德华.mp3&key=eO1mQEPhKjCAZ6BfX04JZA"} controls />
+        <audio src={musicUrl} controls />
         {/* 播放器容器单独放置，确保ref挂载 */}
         <div className="player-container" ref={playerRef} style={{ marginBottom: 16 }} />
         <Card 
@@ -211,6 +219,14 @@ function App() {
             </div>
           </Card>
         )}
+          <APlayer
+    audio={{
+      url: musicUrl,
+      name: currentSong ? currentSong.title : '暂无歌曲',
+      artist: currentSong ? currentSong.artist : '未知',
+    }}
+  />
+
       </Content>
     </Layout>
   );
