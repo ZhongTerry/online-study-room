@@ -220,11 +220,11 @@ function App() {
           </Card>
         )}
           <APlayer
-    audio={{
+    audio={[{
       url: musicUrl,
       name: currentSong ? currentSong.title : '暂无歌曲',
       artist: currentSong ? currentSong.artist : '未知',
-    }}
+    }]}
   />
 
       </Content>
