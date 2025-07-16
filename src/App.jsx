@@ -95,7 +95,6 @@ function App() {
       }
       
       const result = await response.json();
-      // 保存当前歌曲信息
       setCurrentSong({
         ...result,
         artist: song.artist,
@@ -103,22 +102,22 @@ function App() {
       });
 
       // 立即添加并播放
+      const url = encodeURI(`http://127.0.0.1:8000${result.download_api}`);
+      console.log('APlayer播放URL:', url);
+
       if (aplayerInstance.current) {
         aplayerInstance.current.list.clear();
         aplayerInstance.current.list.add({
           name: song.title,
           artist: song.artist,
-          url: `http://127.0.0.1:8000${result.download_api}`,
+          url,
           cover: 'https://via.placeholder.com/100?text=Music',
           type: 'audio/mp3'
         });
-        // 监听 canplay 事件后再播放
-        const ap = aplayerInstance.current;
-        const onCanPlay = () => {
-          ap.play();
-          ap.off('canplay', onCanPlay); // 播放后移除监听
-        };
-        ap.on('canplay', onCanPlay);
+        // 直接play，不用监听canplay
+        setTimeout(() => {
+          aplayerInstance.current.play();
+        }, 0);
       }
 
       message.success(`已加载: ${song.title} - ${song.artist}`);
@@ -156,6 +155,7 @@ function App() {
       </Header>
       
       <Content style={{ padding: '24px' }}>
+        <audio src={"http://127.0.0.1:8000/download_file?filename=今天 - 刘德华.mp3&key=eO1mQEPhKjCAZ6BfX04JZA"} controls />
         {/* 播放器容器单独放置，确保ref挂载 */}
         <div className="player-container" ref={playerRef} style={{ marginBottom: 16 }} />
         <Card 
