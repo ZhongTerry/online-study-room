@@ -220,6 +220,7 @@ function App() {
           </Card>
         )}
           <APlayer
+          autoPlay={false}
     audio={[{
       url: musicUrl,
       name: currentSong ? currentSong.title : '暂无歌曲',
