@@ -31,7 +31,7 @@ function App() {
       aplayerInstance.current = new APlayer({
         container: playerRef.current,
         fixed: true,
-        autoplay: true,
+        autoplay: false, // 不自动播放
         audio: []
       });
     }
@@ -43,30 +43,6 @@ function App() {
       }
     };
   }, []);
-
-  // 当有当前歌曲时更新播放器
-  useEffect(() => {
-    if (currentSong && aplayerInstance.current) {
-      // 清除现有播放列表
-      aplayerInstance.current.list.clear();
-      
-      // 添加新歌曲
-      aplayerInstance.current.list.add({
-        name: currentSong.filename,
-        artist: currentSong.artist,
-        url: `http://127.0.0.1:8000${currentSong.download_api}`,
-        cover: 'https://via.placeholder.com/100?text=Music',
-        type: 'audio/mp3' // 明确指定音频类型
-      });
-      
-      // 尝试播放
-      setTimeout(() => {
-        if (aplayerInstance.current) {
-          aplayerInstance.current.play();
-        }
-      }, 500);
-    }
-  }, [currentSong]);
 
   // 搜索歌曲
   const handleSearch = async () => {
@@ -119,14 +95,32 @@ function App() {
       }
       
       const result = await response.json();
-      console.log(result)
       // 保存当前歌曲信息
       setCurrentSong({
         ...result,
         artist: song.artist,
         title: song.title
       });
-      
+
+      // 立即添加并播放
+      if (aplayerInstance.current) {
+        aplayerInstance.current.list.clear();
+        aplayerInstance.current.list.add({
+          name: song.title,
+          artist: song.artist,
+          url: `http://127.0.0.1:8000${result.download_api}`,
+          cover: 'https://via.placeholder.com/100?text=Music',
+          type: 'audio/mp3'
+        });
+        // 监听 canplay 事件后再播放
+        const ap = aplayerInstance.current;
+        const onCanPlay = () => {
+          ap.play();
+          ap.off('canplay', onCanPlay); // 播放后移除监听
+        };
+        ap.on('canplay', onCanPlay);
+      }
+
       message.success(`已加载: ${song.title} - ${song.artist}`);
     } catch (error) {
       console.error('获取歌曲失败:', error);
@@ -162,12 +156,11 @@ function App() {
       </Header>
       
       <Content style={{ padding: '24px' }}>
+        {/* 播放器容器单独放置，确保ref挂载 */}
+        <div className="player-container" ref={playerRef} style={{ marginBottom: 16 }} />
         <Card 
           title="音乐播放器" 
           style={{ marginBottom: 24 }}
-          extra={
-            <div className="player-container" ref={playerRef} />
-          }
         >
           <Row gutter={16}>
             <Col span={18}>
