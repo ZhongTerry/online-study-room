@@ -141,7 +141,7 @@ function DeadLine() {
             const hours = Math.floor(diff / 3600);
             const minutes = Math.floor((diff % 3600) / 60);
             const seconds = diff % 60;
-            if (hours >= 1) return `距离截止时间事件还有 ${hours} 小时 ${minutes} 分钟`;
+            if (hours >= 1) return `距离截止时间还有 ${hours} 小时 ${minutes} 分钟`;
             return `距离截止时间还有 ${minutes} 分钟 ${seconds} 秒`;
         }
     }
