@@ -11,6 +11,7 @@ const { Title } = Typography;
 import "./index.css";
 import Setting from './Setting';
 import SongSearchTmp from './SongSearchTmp';
+import DeadLine from './DeadLine';
 
 function App() {
   // const [time, setTime] = useState(new Date());
@@ -186,13 +187,18 @@ function App() {
         background: '#fff',
         border: '1px solid #e5e7eb',
         minHeight: 260,
+        display: 'flex',
+        flexDirection: 'column',
       }}
       bodyStyle={{ padding: 32, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}
       title={<span style={{ color: '#222', fontWeight: 700, fontSize: 20 }}>当前时间</span>}
     >
-      <span style={{ fontSize: 48, letterSpacing: 4, color: '#222', fontFamily: 'Consolas' }}>
+      <span style={{ fontSize: 48, letterSpacing: 4, color: '#222', fontFamily: 'Consolas', flexDirection: 'column', alignItems: 'center' }}>
         <Clock />
+        
       </span>
+      
+      <DeadLine></DeadLine>
     </Card>
   </Col>
   <Col xs={24} md={12}>
