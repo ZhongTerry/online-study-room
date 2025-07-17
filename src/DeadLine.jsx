@@ -34,6 +34,12 @@ function DeadLine() {
     const [showAllModal, setShowAllModal] = useState(false);
     const [filterType, setFilterType] = useState('all'); // 'all' | 'full' | 'daily'
 
+    const [editModalOpen, setEditModalOpen] = useState(false);
+    const [editIndex, setEditIndex] = useState(null);
+    const [editEventInput, setEditEventInput] = useState('');
+    const [editDateInput, setEditDateInput] = useState(null);
+    const [editTimeType, setEditTimeType] = useState('full');
+
     useEffect(() => {
         if (deadlines.length > 0) {
             setLatestddl(deadlines[0]);
@@ -135,8 +141,8 @@ function DeadLine() {
             const hours = Math.floor(diff / 3600);
             const minutes = Math.floor((diff % 3600) / 60);
             const seconds = diff % 60;
-            if (hours >= 1) return `距离今日目标还有 ${hours} 小时 ${minutes} 分钟`;
-            return `距离今日目标还有 ${minutes} 分钟 ${seconds} 秒`;
+            if (hours >= 1) return `距离截止时间事件还有 ${hours} 小时 ${minutes} 分钟`;
+            return `距离截止时间还有 ${minutes} 分钟 ${seconds} 秒`;
         }
     }
 
@@ -240,6 +246,21 @@ function DeadLine() {
                             <List.Item
                                 actions={[
                                     <Button
+                                        type="primary"
+                                        size="small"
+                                        onClick={() => {
+                                            setEditIndex(realIndex);
+                                            setEditEventInput(item.event);
+                                            setEditDateInput(item.type === 'full'
+                                                ? dayjs(item.time)
+                                                : dayjs(item.time, 'HH:mm:ss'));
+                                            setEditTimeType(item.type);
+                                            setEditModalOpen(true);
+                                        }}
+                                    >
+                                        编辑
+                                    </Button>,
+                                    <Button
                                         danger
                                         size="small"
                                         onClick={() => handleDeleteDeadline(realIndex)}
@@ -264,6 +285,61 @@ function DeadLine() {
                         );
                     }}
                 />
+            </Modal>
+            <Modal
+                title="编辑截止事件"
+                open={editModalOpen}
+                onOk={() => {
+                    if (!editEventInput || !editDateInput) return;
+                    const newList = [...deadlines];
+                    newList[editIndex] = {
+                        event: editEventInput,
+                        time: editTimeType === 'full'
+                            ? dayjs(editDateInput).format('YYYY-MM-DD HH:mm:ss')
+                            : dayjs(editDateInput).format('HH:mm:ss'),
+                        type: editTimeType
+                    };
+                    const sortedList = newList.sort((a, b) => getNextOccur(a) - getNextOccur(b));
+                    setDeadlines(sortedList);
+                    localStorage.setItem('deadlines', JSON.stringify(sortedList));
+                    setEditModalOpen(false);
+                }}
+                onCancel={() => setEditModalOpen(false)}
+                okText="保存"
+                cancelText="取消"
+            >
+                <Radio.Group
+                    value={editTimeType}
+                    onChange={e => setEditTimeType(e.target.value)}
+                    style={{ marginBottom: 16 }}
+                >
+                    <Radio value="full">具体日期时间</Radio>
+                    <Radio value="daily">每天固定时间</Radio>
+                </Radio.Group>
+                <Input
+                    placeholder="事件名称"
+                    value={editEventInput}
+                    onChange={e => setEditEventInput(e.target.value)}
+                    style={{ marginBottom: 16 }}
+                />
+                {editTimeType === 'full' ? (
+                    <DatePicker
+                        showTime
+                        value={editDateInput}
+                        onChange={setEditDateInput}
+                        style={{ width: '100%' }}
+                        format="YYYY-MM-DD HH:mm:ss"
+                        placeholder="选择截止时间"
+                    />
+                ) : (
+                    <TimePicker
+                        value={editDateInput}
+                        onChange={setEditDateInput}
+                        style={{ width: '100%' }}
+                        format="HH:mm:ss"
+                        placeholder="选择每天截止时间"
+                    />
+                )}
             </Modal>
         </>
     );
