@@ -39,6 +39,13 @@ const ReactAplayer = ({ options }) => {
   //   }
   // }, [options.audio]);
 
+//   return (
+//     <div
+//   dangerouslySetInnerHTML={{
+//     __html: `<meting-js server="netease" type="playlist" id="3136952023" fixed="true" autoplay="false"></meting-js>`
+//   }}
+// />
+//   )
   return <div class="h-full w-full" ref={playerRef} />;
 };
 

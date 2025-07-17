@@ -9,6 +9,8 @@ import Clock from './Clock'; // 引入时钟组件
 const { Header, Content } = Layout;
 const { Title } = Typography;
 import "./index.css";
+import Setting from './Setting';
+import SongSearchTmp from './SongSearchTmp';
 
 function App() {
   // const [time, setTime] = useState(new Date());
@@ -170,6 +172,9 @@ function App() {
         </Row>
       </Header> */}
       <Content class="w-full h-full">
+        
+        <Setting/>
+        {/* <SongSearchTmp songName={"今天"} /> */}
         <div class="p-24 w-full h-full grid grid-rows-2 gap-4">
           {/* <Col class="h-full w-full" gutter={16}> */}
           
