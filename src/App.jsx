@@ -4,12 +4,13 @@ import { Layout, Input, Button, List, Typography, Card, Row, Col, message } from
 import { APlayer } from 'aplayer-react';
 import 'aplayer/dist/APlayer.min.css';
 import './App.css'; // 添加自定义样式
-
+import ReactAplayer from './ReactAplayer';
+import Clock from './Clock'; // 引入时钟组件
 const { Header, Content } = Layout;
 const { Title } = Typography;
 
 function App() {
-  const [time, setTime] = useState(new Date());
+  // const [time, setTime] = useState(new Date());
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -19,13 +20,13 @@ function App() {
   const [musicUrl, setMusicUrl] = useState('')
 
   // 更新时间
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setTime(new Date());
-    }, 1000);
+  // useEffect(() => {
+  //   const timer = setInterval(() => {
+  //     setTime(new Date());
+  //   }, 1000);
     
-    return () => clearInterval(timer);
-  }, []);
+  //   return () => clearInterval(timer);
+  // }, []);
 
   // 初始化播放器
   // useEffect(() => {
@@ -97,6 +98,13 @@ function App() {
       }
       
       const result = await response.json();
+    //       const response2 = await fetch(`http://127.0.0.1:8000/download_file?filename=${encodeURIComponent(result.filename)}&key=${result.key}`);
+    // if (!response2.ok) {
+    //   throw new Error(`获取歌曲失败: ${response2.status}`);
+    // }
+    // const blob = await response2.blob();
+    // const blobUrl = URL.createObjectURL(blob);
+
       setCurrentSong({
         ...result,
         artist: song.artist,
@@ -106,10 +114,9 @@ function App() {
       // 立即添加并播放
           // const path = encodeURIComponent(result.download_api);
           const path = result.download_api;
-    const url = `http://127.0.0.1:8000${path}`;
-    
-    setMusicUrl(url);
-    console.log('音乐URL:', url);
+    // const url = `http://127.0.0.1:8000${path}`;
+    setMusicUrl(path);
+    console.log('音乐URL:', path);
 
     // if (aplayerInstance.current) {
     //   aplayerInstance.current.list.clear();
@@ -156,7 +163,7 @@ function App() {
           </Col>
           <Col>
             <Title level={2} style={{ margin: 0 }}>
-              {formatTime(time)}
+              <Clock/>
             </Title>
           </Col>
         </Row>
@@ -219,14 +226,36 @@ function App() {
             </div>
           </Card>
         )}
-          <APlayer
-          autoPlay={false}
-    audio={[{
-      url: musicUrl,
-      name: currentSong ? currentSong.title : '暂无歌曲',
-      artist: currentSong ? currentSong.artist : '未知',
-    }]}
-  />
+        { musicUrl && currentSong && (
+          <>
+          {/* url: {musicUrl} */}
+          <ReactAplayer
+            options={{
+              autoplay:false,
+              audio:[
+                {
+                  url: musicUrl,
+                  name: currentSong.title || '暂无歌曲',
+                  artist: currentSong.artist || '未知',
+                  cover: 'https://fecdn.luogu.com.cn/columba/static.325908fec383795b.logo-single-color.svg'
+                }
+              ]
+            }}
+          /></>
+        )}
+          {/* { musicUrl != "" && (
+            <>
+            musicUrl: {musicUrl}
+            <br />
+                    <APlayer
+                  autoPlay={false}
+            audio={[{
+              url: musicUrl,
+              name: currentSong ? currentSong.title : '暂无歌曲',
+              artist: currentSong ? currentSong.artist : '未知',
+            }]}
+          /></>
+          )} */}
 
       </Content>
     </Layout>
