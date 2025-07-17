@@ -17,35 +17,27 @@ const ReactAplayer = ({ options }) => {
     }
 
     // 组件卸载时销毁播放器
-    return () => {
-      if (playerInstance.current) {
-        playerInstance.current.destroy();
-        playerInstance.current = null;
-      }
-    };
+    // return () => {
+    //   if (playerInstance.current) {
+    //     playerInstance.current.destroy();
+    //     playerInstance.current = null;
+    //   }
+    // };
   }, [options]);
   console.log('APlayer options:', options);
   // 监听配置变化（如动态歌单）
-  // useEffect(() => {
-  //   if (playerInstance.current && options.audio) {
-  //     playerInstance.current.list.clear();
-  //     // 保证 audio 是数组且每项合法
-  //     let audioArr = Array.isArray(options.audio) ? options.audio : [options.audio];
-  //     console.log('更新音频列表:', audioArr);
-  //     audioArr = audioArr.filter(item => item && typeof item.url === 'string' && item.url); // 过滤非法项
-  //     if (audioArr.length > 0) {
-  //       playerInstance.current.list.add(audioArr);
-  //     }
-  //   }
-  // }, [options.audio]);
+  useEffect(() => {
+    if (playerInstance.current && options.audio) {
+      playerInstance.current.list.clear();
+      // 保证 audio 是数组且每项合法
+      let audioArr = Array.isArray(options.audio) ? options.audio : [options.audio];
+      audioArr = audioArr.filter(item => item && typeof item.url === 'string' && item.url);
+      if (audioArr.length > 0) {
+        playerInstance.current.list.add(audioArr);
+      }
+    }
+  }, [options.audio]);
 
-//   return (
-//     <div
-//   dangerouslySetInnerHTML={{
-//     __html: `<meting-js server="netease" type="playlist" id="3136952023" fixed="true" autoplay="false"></meting-js>`
-//   }}
-// />
-//   )
   return <div class="h-full w-full" ref={playerRef} />;
 };
 

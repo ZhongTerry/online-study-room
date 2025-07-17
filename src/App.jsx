@@ -22,6 +22,7 @@ function App() {
   const playerRef = useRef(null);
   const aplayerInstance = useRef(null);
   const [musicUrl, setMusicUrl] = useState('')
+  const [audioList, setAudioList] = useState([]);
 
   // 更新时间
   // useEffect(() => {
@@ -96,49 +97,27 @@ function App() {
           index: song.index 
         })
       });
-      
-      if (!response.ok) {
-        throw new Error(`获取歌曲失败: ${response.status}`);
-      }
-      
+      if (!response.ok) throw new Error(`获取歌曲失败: ${response.status}`);
       const result = await response.json();
-    //       const response2 = await fetch(`http://127.0.0.1:8000/download_file?filename=${encodeURIComponent(result.filename)}&key=${result.key}`);
-    // if (!response2.ok) {
-    //   throw new Error(`获取歌曲失败: ${response2.status}`);
-    // }
-    // const blob = await response2.blob();
-    // const blobUrl = URL.createObjectURL(blob);
-
       setCurrentSong({
         ...result,
         artist: song.artist,
         title: song.title
       });
+      const path = result.download_api;
+      setMusicUrl(path);
 
-      // 立即添加并播放
-          // const path = encodeURIComponent(result.download_api);
-          const path = result.download_api;
-    // const url = `http://127.0.0.1:8000${path}`;
-    setMusicUrl(path);
-    console.log('音乐URL:', path);
-
-    // if (aplayerInstance.current) {
-    //   aplayerInstance.current.list.clear();
-      
-    //   // 添加音频（不指定type）
-    //   aplayerInstance.current.list.add({
-    //     name: song.title,
-    //     artist: song.artist,
-    //     url,
-    //     cover: 'https://via.placeholder.com/100?text=Music'
-    //   });
-
-    //   // 确保加载完成后再播放
-    //   aplayerInstance.current.on('loadeddata', () => {
-    //     aplayerInstance.current.play();
-    //   });
-    // }
-
+      // 新增：加入到 audioList
+      setAudioList(prev => [
+        ...prev,
+        {
+          name: song.title,
+          artist: song.artist,
+          url: path,
+          cover: result.cover,
+          lrc: result.lrc,
+        }
+      ]);
       message.success(`已加载: ${song.title} - ${song.artist}`);
     } catch (error) {
       console.error('获取歌曲失败:', error);
@@ -213,20 +192,14 @@ function App() {
       bodyStyle={{ padding: 32, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}
       title={<span style={{ color: '#222', fontWeight: 700, fontSize: 20 }}>当前播放</span>}
     >
-      {currentSong ? (
+      {audioList.length > 0 ? (
         <ReactAplayer
           options={{
             autoplay: false,
             lrcType: 1,
-            audio: {
-              name: currentSong.title,
-              artist: currentSong.artist,
-              url: musicUrl,
-              cover: currentSong.cover,
-              lrc: currentSong.lrc,
-            }
+            audio: audioList
           }}
-        ></ReactAplayer>
+        />
       ) : (
         <span style={{ color: '#888', fontSize: 20 }}>暂无播放</span>
       )}
