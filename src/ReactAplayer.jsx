@@ -39,7 +39,7 @@ const ReactAplayer = ({ options }) => {
   //   }
   // }, [options.audio]);
 
-  return <div class="h-60 w-screen" ref={playerRef} />;
+  return <div class="h-full w-full" ref={playerRef} />;
 };
 
 export default ReactAplayer;

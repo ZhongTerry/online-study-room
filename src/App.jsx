@@ -8,6 +8,7 @@ import ReactAplayer from './ReactAplayer';
 import Clock from './Clock'; // 引入时钟组件
 const { Header, Content } = Layout;
 const { Title } = Typography;
+import "./index.css";
 
 function App() {
   // const [time, setTime] = useState(new Date());
@@ -155,108 +156,130 @@ function App() {
   };
 
   return (
-    <Layout style={{ minHeight: '100vh' }}>
-      <Header style={{ background: '#fff', padding: 0 }}>
-        <Row justify="space-between" align="middle" style={{ padding: '0 24px' }}>
+    <Layout style={{background: '#f7f8fa'}}>
+      {/* <Header style={{
+        background: '#fff',
+        padding: 0,
+        boxShadow: '0 2px 8px #f0f1f2',
+        borderBottom: '1px solid #e5e7eb'
+      }}>
+        <Row justify="center" align="middle" style={{ height: 64 }}>
           <Col>
-            <Title level={3} style={{ margin: 0 }}>自习室</Title>
-          </Col>
-          <Col>
-            <Title level={2} style={{ margin: 0 }}>
-              <Clock/>
-            </Title>
+            <Title level={3} style={{ margin: 0, color: '#222', letterSpacing: 2, fontWeight: 700, fontSize: 28 }}>在线自习室</Title>
           </Col>
         </Row>
-      </Header>
-      
-      <Content style={{ padding: '24px' }}>
-        <audio src={musicUrl} controls />
-        {/* 播放器容器单独放置，确保ref挂载 */}
-        <div className="player-container" ref={playerRef} style={{ marginBottom: 16 }} />
-        <Card 
-          title="音乐播放器" 
-          style={{ marginBottom: 24 }}
-        >
-          <Row gutter={16}>
-            <Col span={18}>
-              <Input.Search
-                placeholder="搜索歌曲..."
-                enterButton="搜索"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                onSearch={handleSearch}
-                loading={loading}
-              />
-            </Col>
-          </Row>
+      </Header> */}
+      <Content class="w-full h-full">
+        <div class="p-24 w-full h-full grid grid-rows-2 gap-4">
+          {/* <Col class="h-full w-full" gutter={16}> */}
           
-          {searchResults.length > 0 && (
-            <List
-              style={{ marginTop: 20 }}
-              loading={loading}
-              dataSource={searchResults}
-              renderItem={(item) => (
-                <List.Item 
-                  actions={[
-                    <Button 
-                      type="primary" 
-                      onClick={() => handleSelectSong(item)}
-                      loading={loading}
-                    >
-                      播放
-                    </Button>
-                  ]}
-                >
-                  <List.Item.Meta
-                    title={`${item.title}`}
-                    description={`歌手: ${item.artist}`}
-                  />
-                </List.Item>
-              )}
-            />
-          )}
-        </Card>
-        
-        {currentSong && (
-          <Card title="当前播放">
-            <div>
-              <p><strong>歌曲:</strong> {currentSong.title}</p>
-              <p><strong>歌手:</strong> {currentSong.artist}</p>
-              <p><strong>文件:</strong> {currentSong.filename}</p>
-            </div>
-          </Card>
-        )}
-        { musicUrl && currentSong && (
-          <>
-          {/* url: {musicUrl} */}
-          <ReactAplayer
-            options={{
-              autoplay:false,
-              audio:[
-                {
-                  url: musicUrl,
-                  name: currentSong.title || '暂无歌曲',
-                  artist: currentSong.artist || '未知',
-                  cover: 'https://fecdn.luogu.com.cn/columba/static.325908fec383795b.logo-single-color.svg'
-                }
-              ]
-            }}
-          /></>
-        )}
-          {/* { musicUrl != "" && (
-            <>
-            musicUrl: {musicUrl}
-            <br />
-                    <APlayer
-                  autoPlay={false}
-            audio={[{
+<Row gutter={20}>
+  <Col xs={24} md={12}>
+    <Card
+      style={{
+        borderRadius: 20,
+        background: '#fff',
+        border: '1px solid #e5e7eb',
+        minHeight: 260,
+      }}
+      bodyStyle={{ padding: 32, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}
+      title={<span style={{ color: '#222', fontWeight: 700, fontSize: 20 }}>当前时间</span>}
+    >
+      <span style={{ fontSize: 48, letterSpacing: 4, color: '#222', fontFamily: 'Consolas' }}>
+        <Clock />
+      </span>
+    </Card>
+  </Col>
+  <Col xs={24} md={12}>
+    <Card
+      class="h-full w-full"
+      style={{
+        borderRadius: 20,
+        background: '#fff',
+        border: '1px solid #e5e7eb',
+        minHeight: 260
+      }}
+      bodyStyle={{ padding: 32, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}
+      title={<span style={{ color: '#222', fontWeight: 700, fontSize: 20 }}>当前播放</span>}
+    >
+      {currentSong ? (
+        <ReactAplayer
+          options={{
+            autoplay: false,
+            lrcType: 1,
+            audio: [{
+              name: currentSong.title,
+              artist: currentSong.artist,
               url: musicUrl,
-              name: currentSong ? currentSong.title : '暂无歌曲',
-              artist: currentSong ? currentSong.artist : '未知',
-            }]}
-          /></>
-          )} */}
-
+              cover: currentSong.cover,
+              lrc: currentSong.lrc,
+            }]
+          }}
+        ></ReactAplayer>
+      ) : (
+        <span style={{ color: '#888', fontSize: 20 }}>暂无播放</span>
+      )}
+    </Card>
+  </Col>
+</Row>
+        
+        <Row style={{ width: '100%' }} class="mt-4" span={12}>
+          <Col span={24}>
+            <Card
+              style={{
+                borderRadius: 20,
+                background: '#fff',
+                border: '1px solid #e5e7eb'
+              }}
+              bodyStyle={{ padding: 32 }}
+              title={<span style={{ color: '#222', fontWeight: 700, fontSize: 20 }}>歌曲列表</span>}
+              extra={
+                <Input.Search
+                  placeholder="输入歌曲名称..."
+                  enterButton="点歌"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  onSearch={handleSearch}
+                  loading={loading}
+                  style={{ borderRadius: 8, width: 200, background: '#f3f4f6', color: '#222' }}
+                />
+              }
+            >
+              {searchResults.length > 0 ? (
+                <List
+                  style={{ marginTop: 20 }}
+                  loading={loading}
+                  dataSource={searchResults}
+                  renderItem={(item) => (
+                    <List.Item
+                      actions={[
+                        <Button
+                          type="primary"
+                          onClick={() => handleSelectSong(item)}
+                          loading={loading}
+                          style={{ borderRadius: 6 }}
+                        >
+                          播放
+                        </Button>
+                      ]}
+                      style={{ padding: '12px 0' }}
+                    >
+                      <List.Item.Meta
+                        title={<span style={{ color: '#222' }}>{item.title}</span>}
+                        description={<span style={{ color: '#888' }}>歌手: {item.artist}</span>}
+                      />
+                    </List.Item>
+                  )}
+                />
+              ) : (
+                <div style={{ color: '#888', textAlign: 'center', fontSize: 20, margin: '48px 0' }}>暂无歌曲</div>
+              )}
+            </Card>
+          </Col>
+        </Row>
+          {/* </Col> */}
+        </div>
+        
       </Content>
     </Layout>
   );
