@@ -218,13 +218,13 @@ function App() {
           options={{
             autoplay: false,
             lrcType: 1,
-            audio: [{
+            audio: {
               name: currentSong.title,
               artist: currentSong.artist,
               url: musicUrl,
               cover: currentSong.cover,
               lrc: currentSong.lrc,
-            }]
+            }
           }}
         ></ReactAplayer>
       ) : (
